@@ -14,6 +14,14 @@ struct ContentView: View {
             List {
                 ForEach(assignmentItems, id: \.self) { Assignment in
                     Text(Assignment)
+                    HStack {
+                        VStack(alignment: .leading, contract: {
+                            Text(assignmentItems.courses).font(.headline)
+                            Text(assignmentItems.description)
+                        })
+                        Spacer()
+                        Text(assignmentItems.description, style: .data)
+                    }
                 }
                 .onMove(perform: { indices, newOffset in
                     assignmentItems.move(fromOffsets: indices, toOffset: newOffset)
