@@ -8,30 +8,38 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var assignmentItems = ["First Assignment", "Second Assignment", "Third Assignment", "Fourth Assignment", "Fifth Assignment"]
+    @ObservedObject var assignmentList = AssignmentList()
+    @State private var showingAddAssignmentView = false
     var body: some View {
         NavigationView {
             List {
-                ForEach(assignmentItems, id: \.self) { Assignment in
-                    Text(Assignment)
+                ForEach(assignmentList.items) { item in
                     HStack {
-                        VStack(alignment: .leading, contract: {
-                            Text(assignmentItems.courses).font(.headline)
-                            Text(assignmentItems.description)
+                        VStack(alignment: .leading, content: {
+                            Text(item.course).font(.headline)
+                            Text(item.description)
                         })
                         Spacer()
-                        Text(assignmentItems.description, style: .data)
+                        Text(item.dueDate, style: .date)
                     }
                 }
                 .onMove(perform: { indices, newOffset in
-                    assignmentItems.move(fromOffsets: indices, toOffset: newOffset)
+                    assignmentList.items.move(fromOffsets: indices, toOffset: newOffset)
                 })
                 .onDelete(perform: { IndexSet in
-                    assignmentItems.remove(atOffsets: IndexSet)
+                    assignmentList.items.remove(atOffsets: IndexSet)
                 })
             }
+            .sheet(isPresented: $showingAddAssignmentView, content: {
+                AddAssignmentView(assignmentList: assignmentList)
+            })
             .navigationBarTitle("Assignment Notebook", displayMode: .inline)
-            .navigationBarItems(leading: EditButton())
+            .navigationBarItems(leading: EditButton(),
+                                trailing: Button(action: {
+                showingAddAssignmentView = true
+            }, label: {
+                Image(systemName: "plus")
+            }))
         }
     }
 }
